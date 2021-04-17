@@ -81,13 +81,14 @@ module.exports = class extends Generator {
 
   end() {
     this.spawnCommandSync('git', ['init']);
+    this.spawnCommandSync('git', ['add', '.']);
+    this.spawnCommandSync('git', ['commit', '-m', '"Start"']);
+    this.spawnCommandSync('git', ['branch', '-M', 'main']);
     this.spawnCommandSync('git', [
       'remote',
       'add',
       'origin',
       `https://github.com/maldan/${this.props.template}-${this.props.name}.git`,
     ]);
-    this.spawnCommand('git', ['add --all']);
-    this.spawnCommand('git', ['commit -m "Start"']);
   }
 };
