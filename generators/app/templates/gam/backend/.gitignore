@@ -1,0 +1,8 @@
+node_modules
+bin
+dist
+build
+app.exe
+run.bat
+runhidden.exe
+docs

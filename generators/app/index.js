@@ -20,6 +20,18 @@ module.exports = class extends Generator {
       ...this.props,
     };
 
+    // Input project title
+    this.props = {
+      ...(await this.prompt([
+        {
+          type: 'input',
+          name: 'title',
+          message: 'Enter project title',
+        },
+      ])),
+      ...this.props,
+    };
+
     // Input project description
     this.props = {
       ...(await this.prompt([
@@ -47,6 +59,10 @@ module.exports = class extends Generator {
               name: 'TypeScript Node Library',
               value: 'tslib',
             },
+            {
+              name: 'Gam App',
+              value: 'gam',
+            },
           ],
         },
       ])),
@@ -59,8 +75,46 @@ module.exports = class extends Generator {
     // Replace package json
     this.fs.copyTpl(this.templatePath(`tslib/package.json`), this.destinationPath('package.json'), {
       name: this.props.name,
+      title: this.props.title,
       description: this.props.description,
     });
+  }
+
+  // eslint-disable-next-line camelcase
+  _writeTemplate_gam() {
+    // Replace package json
+    this.fs.copyTpl(this.templatePath(`gam/package.json`), this.destinationPath('package.json'), {
+      name: this.props.name,
+      title: this.props.title,
+      description: this.props.description,
+    });
+    this.fs.copyTpl(
+      this.templatePath(`gam/frontend/package.json`),
+      this.destinationPath('frontend/package.json'),
+      {
+        name: this.props.name,
+        title: this.props.title,
+        description: this.props.description,
+      },
+    );
+    this.fs.copyTpl(
+      this.templatePath(`gam/backend/src/index.ts`),
+      this.destinationPath('backend/src/index.ts'),
+      {
+        name: this.props.name,
+        title: this.props.title,
+        description: this.props.description,
+      },
+    );
+    this.fs.copyTpl(
+      this.templatePath(`gam/backend/package.json`),
+      this.destinationPath('backend/package.json'),
+      {
+        name: this.props.name,
+        title: this.props.title,
+        description: this.props.description,
+      },
+    );
   }
 
   writing() {
