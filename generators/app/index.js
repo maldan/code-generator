@@ -63,6 +63,10 @@ module.exports = class extends Generator {
               name: 'Gam App',
               value: 'gam',
             },
+            {
+              name: 'Gam Go App',
+              value: 'gam-app',
+            },
           ],
         },
       ])),
@@ -88,6 +92,7 @@ module.exports = class extends Generator {
       title: this.props.title,
       description: this.props.description,
     });
+
     this.fs.copyTpl(
       this.templatePath(`gam/frontend/package.json`),
       this.destinationPath('frontend/package.json'),
@@ -97,6 +102,7 @@ module.exports = class extends Generator {
         description: this.props.description,
       },
     );
+
     this.fs.copyTpl(
       this.templatePath(`gam/backend/src/index.ts`),
       this.destinationPath('backend/src/index.ts'),
@@ -106,6 +112,7 @@ module.exports = class extends Generator {
         description: this.props.description,
       },
     );
+
     this.fs.copyTpl(
       this.templatePath(`gam/backend/package.json`),
       this.destinationPath('backend/package.json'),
@@ -117,13 +124,79 @@ module.exports = class extends Generator {
     );
   }
 
+  // eslint-disable-next-line camelcase
+  _writeTemplate_gam_app() {
+    // Replace package json
+    this.fs.copyTpl(
+      this.templatePath(`gam-app/package.json`),
+      this.destinationPath('package.json'),
+      {
+        name: this.props.name,
+        title: this.props.title,
+        description: this.props.description,
+      },
+    );
+    this.fs.copyTpl(
+      this.templatePath(`gam-app/frontend/package.json`),
+      this.destinationPath('frontend/package.json'),
+      {
+        name: this.props.name,
+        title: this.props.title,
+        description: this.props.description,
+      },
+    );
+    this.fs.copyTpl(this.templatePath(`gam-app/go.mod`), this.destinationPath('go.mod'), {
+      name: this.props.name,
+      title: this.props.title,
+      description: this.props.description,
+    });
+    this.fs.copyTpl(this.templatePath(`gam-app/main.go`), this.destinationPath('main.go'), {
+      name: this.props.name,
+      title: this.props.title,
+      description: this.props.description,
+    });
+
+    this.fs.copyTpl(
+      this.templatePath(`gam-app/internal/app/helloworld/helloworld.go`),
+      this.destinationPath(`internal/app/${this.props.name}/${this.props.name}.go`),
+      {
+        name: this.props.name,
+        title: this.props.title,
+        description: this.props.description,
+      },
+    );
+
+    this.fs.copyTpl(
+      this.templatePath(`gam-app/internal/app/helloworld/const.go`),
+      this.destinationPath(`internal/app/const.go`),
+      {
+        name: this.props.name,
+        title: this.props.title,
+        description: this.props.description,
+      },
+    );
+
+    this.fs.copyTpl(
+      this.templatePath(`gam-app/internal/app/helloworld/test_api.go`),
+      this.destinationPath(`internal/app/test_api.go`),
+      {
+        name: this.props.name,
+        title: this.props.title,
+        description: this.props.description,
+      },
+    );
+
+    this.fs.delete(`internal/app/helloworld/helloworld.go`);
+    this.fs.delete(`internal/app/helloworld`);
+  }
+
   writing() {
     this.log('s', this.props.template);
     this.fs.copy(this.templatePath(`${this.props.template}/**`), this.destinationRoot(), {
       globOptions: { dot: true },
     });
 
-    this[`_writeTemplate_${this.props.template}`]();
+    this[`_writeTemplate_${this.props.template.replace(/-/g, '_')}`]();
   }
 
   install() {
@@ -144,5 +217,7 @@ module.exports = class extends Generator {
       'origin',
       `https://github.com/maldan/${this.props.template}-${this.props.name}.git`,
     ]);
+    this.spawnCommandSync('git', ['branch', 'dev']);
+    this.spawnCommandSync('git', ['checkout', 'dev']);
   }
 };
