@@ -23,6 +23,9 @@ module.exports = {
 
     'vue/no-use-v-if-with-v-for': 'off',
     'vue/no-unused-components': 'off',
+
+    '@typescript-eslint/ban-ts-comment': 'off',
+    'vue/no-mutating-props': 'off',
   },
   overrides: [
     {

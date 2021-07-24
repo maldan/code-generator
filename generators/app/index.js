@@ -157,37 +157,14 @@ module.exports = class extends Generator {
     });
 
     this.fs.copyTpl(
-      this.templatePath(`gam-app/internal/app/helloworld/helloworld.go`),
-      this.destinationPath(`internal/app/${this.props.name}/${this.props.name}.go`),
+      this.templatePath(`gam-app/internal/app/helloworld/main.go`),
+      this.destinationPath(`internal/app/helloworld/main.go`),
       {
         name: this.props.name,
         title: this.props.title,
         description: this.props.description,
       },
     );
-
-    this.fs.copyTpl(
-      this.templatePath(`gam-app/internal/app/helloworld/const.go`),
-      this.destinationPath(`internal/app/const.go`),
-      {
-        name: this.props.name,
-        title: this.props.title,
-        description: this.props.description,
-      },
-    );
-
-    this.fs.copyTpl(
-      this.templatePath(`gam-app/internal/app/helloworld/test_api.go`),
-      this.destinationPath(`internal/app/test_api.go`),
-      {
-        name: this.props.name,
-        title: this.props.title,
-        description: this.props.description,
-      },
-    );
-
-    this.fs.delete(`internal/app/helloworld/helloworld.go`);
-    this.fs.delete(`internal/app/helloworld`);
   }
 
   writing() {
