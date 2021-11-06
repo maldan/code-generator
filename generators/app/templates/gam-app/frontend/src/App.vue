@@ -1,5 +1,6 @@
 <template>
   <router-view />
+  <ui-modal-view />
 </template>
 
 <script lang="ts">
@@ -13,6 +14,7 @@ export default defineComponent({
     return {
       // @ts-ignore
       API_URL: process.env.VUE_APP_API_URL || `${window.location.origin}/api`,
+      console: console,
     };
   },
 });

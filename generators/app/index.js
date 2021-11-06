@@ -2,6 +2,7 @@
 const Generator = require('yeoman-generator');
 const chalk = require('chalk');
 const yosay = require('yosay');
+const fs = require('fs');
 
 module.exports = class extends Generator {
   async prompting() {
@@ -55,14 +56,14 @@ module.exports = class extends Generator {
           name: 'template',
           message: 'Select Template:',
           choices: [
-            {
+            /*{
               name: 'TypeScript Node Library',
               value: 'tslib',
             },
             {
               name: 'Gam App',
               value: 'gam',
-            },
+            },*/
             {
               name: 'Gam Go App',
               value: 'gam-app',
@@ -176,17 +177,37 @@ module.exports = class extends Generator {
     this[`_writeTemplate_${this.props.template.replace(/-/g, '_')}`]();
   }
 
-  install() {
-    this.installDependencies({
-      npm: true,
-      bower: false,
-    });
-  }
+  install() {}
 
   end() {
+    // Git init
     this.spawnCommandSync('git', ['init']);
+
+    // Rename
+    fs.renameSync(
+      this.destinationPath('internal/app/helloworld'),
+      this.destinationPath('internal/app/' + this.props.name),
+    );
+
+    // Go tidy
+    this.spawnCommandSync('go', ['mod', 'tidy']);
+
+    // Add submodule
+    this.spawnCommandSync('git', ['submodule', 'add', 'https://github.com/maldan/gam_sdk_ui'], {
+      cwd: this.destinationPath('frontend/src'),
+    });
+
+    // Deps
+    this.spawnCommandSync('pnpm', ['install', '--shamefully-hoist'], {
+      cwd: this.destinationPath('frontend'),
+    });
+    this.spawnCommandSync('pnpm', ['build'], {
+      cwd: this.destinationPath('frontend'),
+    });
+
+    // Git commit
     this.spawnCommandSync('git', ['add', '.']);
-    this.spawnCommandSync('git', ['commit', '-m', '"Start"']);
+    this.spawnCommandSync('git', ['commit', '-m', 'Fix\n-- Start']);
     this.spawnCommandSync('git', ['branch', '-M', 'main']);
     this.spawnCommandSync('git', [
       'remote',
