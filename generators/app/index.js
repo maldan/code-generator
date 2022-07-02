@@ -64,9 +64,13 @@ module.exports = class extends Generator {
               name: 'Gam App',
               value: 'gam',
             },*/
-            {
+            /*{
               name: 'Gam Go App',
               value: 'gam-app',
+            },*/
+            {
+              name: 'Gam Go App New',
+              value: 'gam-app-new',
             },
           ],
         },
@@ -168,6 +172,49 @@ module.exports = class extends Generator {
     );
   }
 
+  // eslint-disable-next-line camelcase
+  _writeTemplate_gam_app_new() {
+    // Replace package json
+    this.fs.copyTpl(
+      this.templatePath(`gam-app-new/package.json`),
+      this.destinationPath('package.json'),
+      {
+        name: this.props.name,
+        title: this.props.title,
+        description: this.props.description,
+      },
+    );
+    this.fs.copyTpl(
+      this.templatePath(`gam-app-new/frontend/package.json`),
+      this.destinationPath('frontend/package.json'),
+      {
+        name: this.props.name,
+        title: this.props.title,
+        description: this.props.description,
+      },
+    );
+    this.fs.copyTpl(this.templatePath(`gam-app-new/go.mod`), this.destinationPath('go.mod'), {
+      name: this.props.name,
+      title: this.props.title,
+      description: this.props.description,
+    });
+    this.fs.copyTpl(this.templatePath(`gam-app-new/main.go`), this.destinationPath('main.go'), {
+      name: this.props.name,
+      title: this.props.title,
+      description: this.props.description,
+    });
+
+    this.fs.copyTpl(
+      this.templatePath(`gam-app-new/internal/app/helloworld/main.go`),
+      this.destinationPath(`internal/app/helloworld/main.go`),
+      {
+        name: this.props.name,
+        title: this.props.title,
+        description: this.props.description,
+      },
+    );
+  }
+
   writing() {
     this.log('s', this.props.template);
     this.fs.copy(this.templatePath(`${this.props.template}/**`), this.destinationRoot(), {
@@ -193,9 +240,16 @@ module.exports = class extends Generator {
     this.spawnCommandSync('go', ['mod', 'tidy']);
 
     // Add submodule
-    this.spawnCommandSync('git', ['submodule', 'add', 'https://github.com/maldan/gam_sdk_ui'], {
-      cwd: this.destinationPath('frontend/src'),
-    });
+    if (this.props.template === 'gam-app') {
+      this.spawnCommandSync('git', ['submodule', 'add', 'https://github.com/maldan/gam_sdk_ui'], {
+        cwd: this.destinationPath('frontend/src'),
+      });
+    }
+    if (this.props.template === 'gam-app-new') {
+      this.spawnCommandSync('git', ['submodule', 'add', 'https://github.com/maldan/gam-lib-ui'], {
+        cwd: this.destinationPath('frontend/src'),
+      });
+    }
 
     // Deps
     this.spawnCommandSync('pnpm', ['install', '--shamefully-hoist'], {
